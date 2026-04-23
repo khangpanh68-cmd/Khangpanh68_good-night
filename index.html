@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duy Khang ❤️ Phương Anh - Ultra HD Plus</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: #000;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --bg-image: url('https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1000&auto=format&fit=crop');
+            --primary-pink: #ff4d6d;
+        }
+
+        /* --- LOADING SCREEN --- */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.9)), var(--bg-image);
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 1.5s ease;
+        }
+
+        .loading-text {
+            color: #fff; font-size: 1.4rem; margin-bottom: 30px;
+            text-shadow: 0 0 20px var(--primary-pink); font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .progress-container {
+            width: 70%; max-width: 280px; height: 10px;
+            background: rgba(255, 255, 255, 0.1); border-radius: 20px;
+            border: 2px solid rgba(255, 77, 109, 0.4); position: relative;
+        }
+
+        .progress-bar {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, #ff4d6d, #ff8fa3, #ff4d6d);
+            background-size: 200% 100%; border-radius: 20px;
+            box-shadow: 0 0 25px var(--primary-pink);
+        }
+
+        .heart-icon { position: absolute; top: -35px; left: 0%; transform: translateX(-50%); font-size: 28px; }
+
+        /* --- MAIN CONTENT --- */
+        #main-content {
+            opacity: 0; display: none; width: 100%; height: 100%;
+            transition: opacity 2s ease;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.85)), var(--bg-image);
+            background-size: cover; background-position: center;
+        }
+
+        .message-box {
+            position: absolute; top: 48%; left: 50%;
+            transform: translate(-50%, -50%); text-align: center;
+            z-index: 10; width: 88%; pointer-events: none;
+        }
+
+        .couple-name {
+            color: var(--primary-pink); font-size: 2.3rem; margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(255, 77, 109, 1);
+            font-weight: bold;
+        }
+
+        .romantic-text {
+            color: #fff; font-size: 1.05rem; line-height: 1.8;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            padding: 30px; border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.85);
+        }
+
+        .days-count {
+            color: #ff8fa3; font-weight: bold; font-size: 1.3rem;
+            margin-top: 25px; display: block;
+            text-shadow: 0 0 15px rgba(255, 143, 163, 0.6);
+        }
+
+        #doraemon {
+            position: absolute; width: 55px; height: auto;
+            z-index: 20; pointer-events: none;
+            filter: drop-shadow(0 0 10px #fff);
+            will-change: transform, left, top;
+        }
+
+        #music-control {
+            position: fixed; bottom: 35px; right: 35px;
+            z-index: 100; background: var(--primary-pink);
+            width: 55px; height: 55px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 0 25px var(--primary-pink);
+            font-size: 26px;
+        }
+
+        .music-playing { animation: spin 4s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; }
+    </style>
+</head>
+<body onclick="handleGlobalClick(event)">
+
+    <audio id="bg-music" loop>
+        <source src="./nhac.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="music-control" onclick="toggleMusic(event)">🎵</div>
+
+    <div id="loader">
+        <div class="loading-text">Duy Khang ❤️ Phương Anh</div>
+        <div class="progress-container">
+            <div id="bar" class="progress-bar"></div>
+            <div id="heart" class="heart-icon">❤️</div>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <img id="doraemon" src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3YmZfPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/v6aOebdGHtzpG57M9p/giphy.gif" alt="Mon">
+        <div class="message-box">
+            <div class="couple-name">Duy Khang ❤️ Phương Anh</div>
+            <div class="romantic-text" id="wish"></div>
+            <div class="days-count" id="days-box"></div>
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const music = document.getElementById('bg-music');
+        const mBtn = document.getElementById('music-control');
+        const mon = document.getElementById('doraemon');
+        const mainContent = document.getElementById('main-content');
+        let interaction = false;
+
+        // Bến đỗ hạnh phúc từ 21/01/2023
+        const startDate = new Date(2023, 0, 21); 
+
+        const dailyWishes = [
+            "Mỗi ngày trôi qua, anh lại thấy mình thật may mắn khi có em.",
+            "Phương Anh ơi, dẫu nắng hay mưa, Duy Khang vẫn sẽ luôn ở đây lo cho em.",
+            "Chúc cục vàng của anh ngủ thật ngon và có những giấc mơ thật đẹp.",
+            "Trong mắt Duy Khang, Phương Anh luôn là điều tuyệt vời nhất.",
+            "Doraemon có bảo bối, còn Duy Khang có Phương Anh là cả thế giới."
+        ];
+
+        function handleGlobalClick(e) {
+            if (!interaction && mainContent.style.display === 'block') {
+                music.play();
+                mBtn.classList.add('music-playing');
+                interaction = true;
+            }
+            // Tạo vụ nổ tim khi chạm
+            if (mainContent.style.display === 'block') {
+                createHeartExplosion(e.clientX, e.clientY);
+            }
+        }
+
+        function toggleMusic(e) {
+            e.stopPropagation();
+            if (music.paused) {
+                music.play();
+                mBtn.classList.add('music-playing');
+            } else {
+                music.pause();
+                mBtn.classList.remove('music-playing');
+            }
+        }
+
+        function updateDays() {
+            const now = new Date();
+            const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-box').innerHTML = `Đã bên nhau ${diff} ngày hạnh phúc ❤️`;
+        }
+
+        let progress = 0;
+        const loadTimer = setInterval(() => {
+            if (progress >= 100) {
+                clearInterval(loadTimer);
+                setTimeout(() => {
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loader').style.display = 'none';
+                        mainContent.style.display = 'block';
+                        setTimeout(() => {
+                            mainContent.style.opacity = '1';
+                            typeAutoWish();
+                            moveDoraemon();
+                            updateDays();
+                        }, 100);
+                    }, 1000);
+                }, 500);
+            } else {
+                progress += Math.random() * 5;
+                if(progress > 100) progress = 100;
+                document.getElementById('bar').style.width = progress + '%';
+                document.getElementById('heart').style.left = progress + '%';
+            }
+        }, 40);
+
+        function typeAutoWish() {
+            const wishBox = document.getElementById('wish');
+            const randomWish = dailyWishes[Math.floor(Math.random() * dailyWishes.length)];
+            const hours = new Date().getHours();
+            const greeting = (hours >= 18 || hours <= 4) ? "Ngủ ngon nhé cục vàng!" : "Ngày mới tuyệt vời nhé bé yêu!";
+
+            const fullContent = [
+                "<span style='color:#ffd700; font-weight:bold; font-size: 1.3rem;'>\"Nắng đã có mũ, mưa đã có ô\"</span>",
+                "<span style='color:#ffd700; font-weight:bold; font-size: 1.3rem;'>\"Còn Phương Anh đã có Duy Khang lo cả đời...\"</span>",
+                "<br>",
+                greeting,
+                randomWish,
+                "<br>",
+                "<span style='font-size: 0.8rem; opacity: 0.7;'>Powered by Duy Khang for Phương Anh</span>"
+            ];
+
+            let lineIndex = 0;
+            function typeLine() {
+                if (lineIndex < fullContent.length) {
+                    let d = document.createElement('div');
+                    d.innerHTML = fullContent[lineIndex];
+                    wishBox.appendChild(d);
+                    lineIndex++;
+                    setTimeout(typeLine, 1400);
+                }
+            }
+            typeLine();
+        }
+
+        function moveDoraemon() {
+            let angle = 0;
+            function step() {
+                const cx = window.innerWidth / 2;
+                const cy = window.innerHeight / 2;
+                const rx = window.innerWidth * 0.43;
+                const ry = window.innerHeight * 0.43;
+                const x = cx + Math.cos(angle) * rx - 30;
+                const y = cy + Math.sin(angle) * ry - 30;
+                mon.style.left = x + 'px';
+                mon.style.top = y + 'px';
+                mon.style.transform = `scaleX(${Math.cos(angle) > 0 ? -1 : 1})`;
+                angle += 0.01;
+                requestAnimationFrame(step);
+            }
+            step();
+        }
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, c, isHeart = false, size = 1.8) {
+                this.x = x; this.y = y; this.c = c;
+                this.isHeart = isHeart;
+                this.size = size;
+                const a = Math.random() * Math.PI * 2;
+                const s = isHeart ? Math.random() * 0.8 + 0.3 : Math.random() * 6 + 1;
+                this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s;
+                this.alp = 1;
+            }
+            draw() {
+                ctx.globalAlpha = this.alp;
+                if (this.isHeart) {
+                    ctx.fillStyle = "#ff4d6d";
+                    ctx.font = "18px Arial";
+                    ctx.fillText("❤️", this.x, this.y);
+                } else {
+                    ctx.fillStyle = this.c;
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, 7);
+                    ctx.fill();
+                }
+            }
+            up() {
+                this.vx *= 0.98; this.vy *= 0.98; 
+                if(!this.isHeart) this.vy += 0.12;
+                this.x += this.vx; this.y += this.vy;
+                this.alp -= this.isHeart ? 0.003 : 0.012;
+            }
+        }
+
+        function createHeartExplosion(x, y) {
+            for (let i = 0; i < 15; i++) {
+                parts.push(new Particle(x, y, "#ff4d6d", true));
+            }
+        }
+
+        class Firework {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height;
+                this.ty = Math.random() * (canvas.height * 0.45);
+                this.c = `hsl(${Math.random() * 360}, 100%, 75%)`;
+                this.done = false;
+            }
+            up() {
+                this.y -= 11;
+                if (this.y <= this.ty) {
+                    this.done = true;
+                    for (let i = 0; i < 65; i++) parts.push(new Particle(this.x, this.y, this.c));
+                }
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, 3, 0, 7);
+                ctx.fillStyle = this.c; ctx.fill();
+            }
+        }
+
+        let fireworks = []; let parts = [];
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            fireworks.forEach((f, i) => { f.up(); f.draw(); if (f.done) fireworks.splice(i, 1); });
+            parts.forEach((p, i) => { p.up(); p.draw(); if (p.alp <= 0) parts.splice(i, 1); });
+            if (Math.random() < 0.015) parts.push(new Particle(Math.random() * canvas.width, canvas.height, null, true));
+            requestAnimationFrame(loop);
+        }
+        setInterval(() => { if(mainContent.style.opacity === '1') fireworks.push(new Firework()); }, 1500);
+        loop();
+    </script>
+</body>
+</html>
