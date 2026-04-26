@@ -2,226 +2,193 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duy Khang ❤️ Phương Anh - Version 10.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Infinity Love v4.0</title>
     <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: #000;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-        }
-
         :root {
-            --bg-image: url('https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1000&auto=format&fit=crop');
-            --primary-pink: #ff4d6d;
+            --accent: #ff2d55;
+            --bg: #020205;
         }
 
-        /* --- MÀN HÌNH CHỜ (LOADING) --- */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), var(--bg-image);
-            background-size: cover; background-position: center;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
-            transition: opacity 1.2s ease;
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-start {
-            padding: 15px 40px; font-size: 1.2rem; background: var(--primary-pink);
-            color: white; border: none; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 0 20px var(--primary-pink); font-weight: bold;
-            animation: pulse 2s infinite; display: none;
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
 
-        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
-
-        /* --- NỘI DUNG CHÍNH --- */
-        #main-content {
-            opacity: 0; display: none; width: 100%; height: 100%;
-            transition: opacity 2s ease;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.85)), var(--bg-image);
-            background-size: cover; background-position: center;
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            pointer-events: none;
+            padding: 20px;
         }
 
-        .message-box {
-            position: absolute; top: 48%; left: 50%;
-            transform: translate(-50%, -50%); text-align: center;
-            z-index: 10; width: 88%; pointer-events: none;
+        .glass-box {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+            max-width: 380px;
+            width: 100%;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .couple-name {
-            color: var(--primary-pink); font-size: 2.2rem; margin-bottom: 20px;
-            text-shadow: 0 0 30px var(--primary-pink); font-weight: bold;
+        @keyframes slideUp {
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        .romantic-box {
-            color: #fff; font-size: 1.1rem; line-height: 1.8;
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);
-            padding: 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        .heart-glow {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 15px var(--accent));
+            animation: pulse 2s infinite ease-in-out;
         }
 
-        .days-count {
-            color: #ff8fa3; font-weight: bold; font-size: 1.3rem; margin-top: 25px; display: block;
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        #music-control {
-            position: fixed; bottom: 30px; right: 30px; z-index: 100;
-            background: var(--primary-pink); width: 55px; height: 55px;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-size: 24px; box-shadow: 0 0 20px var(--primary-pink);
+        #message {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+            font-weight: 300;
         }
 
-        .rotating { animation: spin 4s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 15px;
+            background: var(--accent);
+            margin-left: 5px;
+            animation: blink 0.8s infinite;
+        }
 
-        #doraemon { position: absolute; width: 55px; z-index: 20; pointer-events: none; filter: drop-shadow(0 0 10px #fff); }
-        canvas { position: absolute; top: 0; left: 0; z-index: 1; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px var(--accent)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 25px var(--accent)); }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
     </style>
 </head>
-<body onclick="handleGlobalClick(event)">
+<body>
 
-    <audio id="bg-music" loop>
-        <source src="./nhac.mp3" type="audio/mpeg">
-    </audio>
+    <canvas id="universe"></canvas>
 
-    <div id="music-control" onclick="toggleMusic(event)">🎵</div>
-
-    <div id="loader">
-        <div id="loading-text" style="color: white; margin-bottom: 20px; font-style: italic; text-align: center;">
-            Đang thắp sáng yêu thương...<br>Duy Khang ❤️ Phương Anh
+    <div class="ui-layer">
+        <div class="glass-box">
+            <svg class="heart-glow" viewBox="0 0 32 32">
+                <path fill="#ff2d55" d="M16 28.5L14.1 26.7C7.33 20.58 3 16.5 3 11.5 3 7.42 6.42 4 10.5 4c2.31 0 4.52 1.08 6 2.79C17.48 5.08 19.69 4 22.5 4 26.58 4 30 7.42 30 11.5c0 5-4.33 9.08-11.1 15.2L16 28.5z"/>
+            </svg>
+            <h1>Gửi Vợ Yêu Phương Anh</h1>
+            <div id="message"></div><span class="cursor"></span>
         </div>
-        <button class="btn-start" id="start-btn" onclick="startExperience()">Nhận quà ngay ❤️</button>
-    </div>
-
-    <div id="main-content">
-        <img id="doraemon" src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3Y5Z3YmZfPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/v6aOebdGHtzpG57M9p/giphy.gif">
-        <div class="message-box">
-            <div class="couple-name">Duy Khang ❤️ Phương Anh</div>
-            <div class="romantic-box" id="wish-box"></div>
-            <div class="days-count" id="days-box"></div>
-        </div>
-        <canvas id="canvas"></canvas>
     </div>
 
     <script>
-        const music = document.getElementById('bg-music');
-        const mBtn = document.getElementById('music-control');
-        const main = document.getElementById('main-content');
-        const loader = document.getElementById('loader');
-        let interaction = false;
-
-        const startDate = new Date(2023, 0, 21); // 21/01/2023
-
-        // Hiện nút sau khi load dữ liệu xong
-        setTimeout(() => {
-            document.getElementById('loading-text').style.display = 'none';
-            document.getElementById('start-btn').style.display = 'block';
-        }, 2000);
-
-        function startExperience() {
-            // "Mở khóa" âm nhạc thông qua tương tác người dùng
-            music.play().then(() => {
-                mBtn.classList.add('rotating');
-            }).catch(e => console.log("Lỗi nhạc:", e));
-            
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-                main.style.display = 'block';
-                setTimeout(() => {
-                    main.style.opacity = '1';
-                    interaction = true;
-                    displayPoem();
-                    moveMon();
-                    updateDays();
-                }, 100);
-            }, 1000);
-        }
-
-        function handleGlobalClick(e) {
-            if (interaction) createExplosion(e.clientX, e.clientY);
-        }
-
-        function toggleMusic(e) {
-            e.stopPropagation();
-            if (music.paused) { music.play(); mBtn.classList.add('rotating'); }
-            else { music.pause(); mBtn.classList.remove('rotating'); }
-        }
-
-        function displayPoem() {
-            const box = document.getElementById('wish-box');
-            const lines = [
-                "Ngàn ngày qua tình mình vẫn vẹn nguyên,",
-                "Duy Khang này nguyện yêu em mãi mãi.",
-                "Dẫu cho sóng gió hay nắng mưa,",
-                "Anh vẫn sẽ lo cho Phương Anh cả cuộc đời này! ❤️"
-            ];
-            let i = 0;
-            function type() {
-                if (i < lines.length) {
-                    let s = document.createElement('div');
-                    s.style.fontStyle = 'italic';
-                    s.style.marginBottom = '10px';
-                    s.innerHTML = lines[i];
-                    box.appendChild(s);
-                    i++;
-                    setTimeout(type, 1500);
-                }
-            }
-            type();
-        }
-
-        function updateDays() {
-            const diff = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
-            document.getElementById('days-box').innerHTML = `Bên nhau ${diff} ngày hạnh phúc ❤️`;
-        }
-
-        function moveMon() {
-            let a = 0;
-            function step() {
-                const x = (window.innerWidth/2) + Math.cos(a) * (window.innerWidth*0.42) - 27;
-                const y = (window.innerHeight/2) + Math.sin(a) * (window.innerHeight*0.42) - 27;
-                const mon = document.getElementById('doraemon');
-                mon.style.left = x + 'px'; mon.style.top = y + 'px';
-                mon.style.transform = `scaleX(${Math.cos(a) > 0 ? -1 : 1})`;
-                a += 0.01; requestAnimationFrame(step);
-            }
-            step();
-        }
-
-        // CANVAS FIREWORKS
-        const canvas = document.getElementById('canvas');
+        const canvas = document.getElementById('universe');
         const ctx = canvas.getContext('2d');
-        let parts = [];
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.onresize = resize; resize();
+        let width, height, stars = [];
 
-        class Part {
-            constructor(x, y, isH) {
-                this.x = x; this.y = y; this.isH = isH;
-                const ang = Math.random() * Math.PI * 2;
-                const s = isH ? Math.random() * 2 + 1 : Math.random() * 6 + 1;
-                this.vx = Math.cos(ang) * s; this.vy = Math.sin(ang) * s;
-                this.a = 1;
+        // Nội dung tin nhắn - Bạn có thể đổi ở đây
+        const textToType = "Anh mượn cả dải ngân hà này để gửi đến vợ lời chúc ngủ ngon ngọt ngào nhất. Hãy ngủ thật ngon, để lại mọi mệt mỏi cho anh gánh vác nhé. Yêu vợ mãi mãi! Gió ơi có bay về phương ấy?Nghiêng bên cửa sổ ghé bên phòng?Nếu thấy ai đó đang nằm ngủ?Nhắn dùm 4 chữ ” Ngủ ngon nhé cục vàng phương anh "
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            stars = [];
+            for(let i=0; i<200; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    z: Math.random() * width,
+                    size: Math.random() * 1.5,
+                    color: `rgba(255, ${150 + Math.random() * 105}, ${200 + Math.random() * 55}, ${Math.random()})`
+                });
             }
-            draw() {
-                ctx.globalAlpha = this.a;
-                if(this.isH) { ctx.font = "20px Arial"; ctx.fillText("❤️", this.x, this.y); }
-                else { ctx.fillStyle = "#ff4d6d"; ctx.beginPath(); ctx.arc(this.x, this.y, 2.5, 0, 7); ctx.fill(); }
-            }
-            update() { this.x += this.vx; this.y += this.vy; this.a -= 0.015; }
         }
 
-        function createExplosion(x, y) { for(let i=0; i<10; i++) parts.push(new Part(x, y, true)); }
+        function draw() {
+            ctx.fillStyle = '#020205';
+            ctx.fillRect(0, 0, width, height);
+            
+            stars.forEach(s => {
+                // Hiệu ứng 3D Starfield
+                s.z -= 0.5; 
+                if (s.z <= 0) s.z = width;
 
-        function loop() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            parts.forEach((p, i) => { p.update(); p.draw(); if(p.a <= 0) parts.splice(i, 1); });
-            if(Math.random() < 0.04) parts.push(new Part(Math.random()*canvas.width, canvas.height + 10, false));
-            requestAnimationFrame(loop);
+                const x = (s.x - width/2) * (width/s.z) + width/2;
+                const y = (s.y - height/2) * (width/s.z) + height/2;
+                const radius = s.size * (width/s.z);
+
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = s.color;
+                ctx.fill();
+            });
+
+            // Hiệu ứng mây tinh vân (Nebula) mờ ảo
+            const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+            gradient.addColorStop(0, 'transparent');
+            gradient.addColorStop(0.5, 'rgba(255, 45, 85, 0.03)');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            requestAnimationFrame(draw);
         }
-        loop();
+
+        // Viết chữ
+        let charIndex = 0;
+        function type() {
+            if (charIndex < textToType.length) {
+                document.getElementById('message').innerHTML += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(type, 70);
+            }
+        }
+
+        window.addEventListener('resize', init);
+        
+        // Chạy chương trình
+        init();
+        draw();
+        setTimeout(type, 2000); // Đợi 2s sau khi hiện box mới viết chữ
     </script>
 </body>
 </html>
