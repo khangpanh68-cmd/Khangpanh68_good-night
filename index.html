@@ -3,192 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Infinity Love v4.0</title>
+    <title>Khang ❤️ Phương Anh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --accent: #ff2d55;
-            --bg: #020205;
-        }
+        :root { --pink: #ff4d6d; --bg: #fff0f3; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; width: 100vw; height: 100vh; background: var(--bg); font-family: 'Quicksand', sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg);
-            color: white;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
+        /* MÀN HÌNH KHỞI ĐỘNG */
+        #unlock-screen { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .heart-btn { width: 90px; height: 90px; background: var(--pink); position: relative; transform: rotate(45deg); animation: beat 1.2s infinite; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.4); }
+        .heart-btn::before, .heart-btn::after { content: ""; width: 90px; height: 90px; background: var(--pink); border-radius: 50%; position: absolute; }
+        .heart-btn::before { top: -45px; left: 0; }
+        .heart-btn::after { left: -45px; top: 0; }
+        @keyframes beat { 0%, 100% { transform: scale(1) rotate(45deg); } 50% { transform: scale(1.1) rotate(45deg); } }
 
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
+        /* GIAO DIỆN CHÍNH */
+        #main-app { display: none; opacity: 0; text-align: center; width: 100%; transition: 1s ease; }
+        #days-count { font-size: 4.5rem; font-weight: bold; color: var(--pink); margin: 5px 0; display: block; text-shadow: 2px 2px #fff; }
 
-        .ui-layer {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            pointer-events: none;
-            padding: 20px;
-        }
+        /* PHONG BÌ */
+        .envelope-wrapper { position: relative; width: 310px; height: 200px; margin: 30px auto 0; }
+        .env-body { position: absolute; bottom: 0; width: 100%; height: 100%; background: #ff758f; border-radius: 0 0 10px 10px; z-index: 3; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .env-flap { position: absolute; top: 0; width: 0; height: 0; border-left: 155px solid transparent; border-right: 155px solid transparent; border-top: 115px solid #ff8fa3; transform-origin: top; transition: 0.6s ease; z-index: 5; }
+        .env-letter { position: absolute; bottom: 10px; left: 10px; width: 290px; height: 180px; background: #fff; padding: 20px; z-index: 2; transition: 0.6s ease; border-radius: 5px; text-align: left; overflow: hidden; }
+        .open .env-flap { transform: rotateX(180deg); z-index: 1; }
+        .open .env-letter { transform: translateY(-135px); height: 320px; z-index: 4; }
+        .poem { font-style: italic; color: #555; font-size: 0.9rem; line-height: 1.6; border-left: 3px solid var(--pink); padding-left: 10px; margin: 10px 0; }
 
-        .glass-box {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 40px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
-            max-width: 380px;
-            width: 100%;
-            transform: translateY(20px);
-            opacity: 0;
-            animation: slideUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes slideUp {
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .heart-glow {
-            width: 70px;
-            height: 70px;
-            margin-bottom: 25px;
-            filter: drop-shadow(0 0 15px var(--accent));
-            animation: pulse 2s infinite ease-in-out;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #message {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.8);
-            font-weight: 300;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 15px;
-            background: var(--accent);
-            margin-left: 5px;
-            animation: blink 0.8s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px var(--accent)); }
-            50% { transform: scale(1.15); filter: drop-shadow(0 0 25px var(--accent)); }
-        }
-
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
+        /* ĐIỀU KHIỂN NHẠC */
+        .music-bar { margin-top: 160px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .btn-play { background: var(--pink); color: #fff; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }
+        #status { font-size: 0.75rem; color: var(--pink); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <canvas id="universe"></canvas>
+    <div id="unlock-screen">
+        <button class="heart-btn" onclick="startApp()"></button>
+        <h2 style="margin-top: 80px; color: var(--pink); font-family: 'Dancing Script'; font-size: 2.2rem;">Gửi Phương Anh ❤️</h2>
+        <p style="color: #aaa; font-size: 0.9rem;">Chạm vào trái tim để bắt đầu</p>
+    </div>
 
-    <div class="ui-layer">
-        <div class="glass-box">
-            <svg class="heart-glow" viewBox="0 0 32 32">
-                <path fill="#ff2d55" d="M16 28.5L14.1 26.7C7.33 20.58 3 16.5 3 11.5 3 7.42 6.42 4 10.5 4c2.31 0 4.52 1.08 6 2.79C17.48 5.08 19.69 4 22.5 4 26.58 4 30 7.42 30 11.5c0 5-4.33 9.08-11.1 15.2L16 28.5z"/>
-            </svg>
-            <h1>Gửi Vợ Yêu Phương Anh</h1>
-            <div id="message"></div><span class="cursor"></span>
+    <audio id="loveAudio" loop preload="auto" crossorigin="anonymous">
+        <source src="https://files.catbox.moe/6qjxys" type="audio/mpeg">
+    </audio>
+
+    <div id="main-app">
+        <div class="counter">
+            <h2 style="font-size: 0.8rem; color: #590d22; margin: 0; letter-spacing: 1.5px;">BÊN NHAU ĐÃ ĐƯỢC</h2>
+            <span id="days-count">0</span>
+            <p style="color: #c9184a; font-weight: bold; margin: 0;">NGÀY HẠNH PHÚC</p>
+        </div>
+
+        <div class="envelope-wrapper" onclick="this.classList.toggle('open')">
+            <div class="env-flap"></div>
+            <div class="env-body"></div>
+            <div class="env-letter">
+                <h3 style="font-family: 'Dancing Script'; color: var(--pink); margin: 0;">Gửi Phương Anh ❤️</h3>
+                <div class="poem">
+                    "Nắng vàng nhuộm thắm trời xanh<br>
+                    Tình em nhuộm thắm lòng anh mất rồi<br>
+                    Dẫu cho vật đổi sao dời<br>
+                    Yêu em mãi mãi suốt đời không quên."
+                </div>
+                <div id="time-msg" style="font-weight: 600; color: #d90429; font-size: 0.85rem; padding-top: 10px; border-top: 1px dashed #ffd1dc;"></div>
+            </div>
+        </div>
+
+        <div class="music-bar">
+            <button class="btn-play" id="ctrlBtn" onclick="toggleMusic()">⏸</button>
+            <span id="status">Đang phát nhạc...</span>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('universe');
-        const ctx = canvas.getContext('2d');
-        let width, height, stars = [];
+        const audio = document.getElementById('loveAudio');
+        const statusText = document.getElementById('status');
+        const ctrlBtn = document.getElementById('ctrlBtn');
 
-        // Nội dung tin nhắn - Bạn có thể đổi ở đây
-        const textToType = "Anh mượn cả dải ngân hà này để gửi đến vợ lời chúc ngủ ngon ngọt ngào nhất. Hãy ngủ thật ngon, để lại mọi mệt mỏi cho anh gánh vác nhé. Yêu vợ mãi mãi! Gió ơi có bay về phương ấy?Nghiêng bên cửa sổ ghé bên phòng?Nếu thấy ai đó đang nằm ngủ?Nhắn dùm 4 chữ ” Ngủ ngon nhé cục vàng phương anh "
-        function init() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            stars = [];
-            for(let i=0; i<200; i++) {
-                stars.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    z: Math.random() * width,
-                    size: Math.random() * 1.5,
-                    color: `rgba(255, ${150 + Math.random() * 105}, ${200 + Math.random() * 55}, ${Math.random()})`
-                });
-            }
-        }
+        function startApp() {
+            // Mở khóa âm thanh cho trình duyệt mobile
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
 
-        function draw() {
-            ctx.fillStyle = '#020205';
-            ctx.fillRect(0, 0, width, height);
-            
-            stars.forEach(s => {
-                // Hiệu ứng 3D Starfield
-                s.z -= 0.5; 
-                if (s.z <= 0) s.z = width;
-
-                const x = (s.x - width/2) * (width/s.z) + width/2;
-                const y = (s.y - height/2) * (width/s.z) + height/2;
-                const radius = s.size * (width/s.z);
-
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fillStyle = s.color;
-                ctx.fill();
+            audio.play().then(() => {
+                statusText.innerText = "🎵 Đang phát nhạc...";
+            }).catch(() => {
+                statusText.innerText = "⚠️ Chạm lần nữa để nghe nhạc!";
             });
 
-            // Hiệu ứng mây tinh vân (Nebula) mờ ảo
-            const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
-            gradient.addColorStop(0, 'transparent');
-            gradient.addColorStop(0.5, 'rgba(255, 45, 85, 0.03)');
-            gradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, width, height);
+            document.getElementById('unlock-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('unlock-screen').style.display = 'none';
+                const app = document.getElementById('main-app');
+                app.style.display = 'block';
+                setTimeout(() => app.style.opacity = '1', 50);
+            }, 800);
 
-            requestAnimationFrame(draw);
+            initData();
         }
 
-        // Viết chữ
-        let charIndex = 0;
-        function type() {
-            if (charIndex < textToType.length) {
-                document.getElementById('message').innerHTML += textToType.charAt(charIndex);
-                charIndex++;
-                setTimeout(type, 70);
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play();
+                ctrlBtn.innerText = "⏸";
+                statusText.innerText = "🎵 Đang phát nhạc...";
+            } else {
+                audio.pause();
+                ctrlBtn.innerText = "▶";
+                statusText.innerText = "🔇 Đã tắt nhạc";
             }
         }
 
-        window.addEventListener('resize', init);
-        
-        // Chạy chương trình
-        init();
-        draw();
-        setTimeout(type, 2000); // Đợi 2s sau khi hiện box mới viết chữ
+        function initData() {
+            const start = new Date('2023-01-21');
+            const now = new Date();
+            const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-count').innerText = diff;
+
+            const hr = now.getHours();
+            let msg = (hr >= 5 && hr < 11) ? "☀️ Chúc buổi sáng thật rạng rỡ nhé bé yêu!" :
+                      (hr >= 11 && hr < 14) ? "🍲 Bé nhớ ăn trưa thật ngon và nghỉ ngơi nhé!" :
+                      (hr >= 14 && hr < 18) ? "☕ Chiều rồi, làm việc tốt nha em, anh nhớ em!" :
+                      "🌙 Chúc em ngủ ngon và mơ về anh nha Phương Anh!";
+            document.getElementById('time-msg').innerText = msg;
+        }
+
+        // Tự động phát nhạc khi chạm bất kỳ đâu sau khi đã start
+        window.addEventListener('touchstart', () => {
+            if (audio.paused && document.getElementById('unlock-screen').style.display === 'none') {
+                audio.play();
+                ctrlBtn.innerText = "⏸";
+                statusText.innerText = "🎵 Đang phát nhạc...";
+            }
+        });
     </script>
 </body>
 </html>
